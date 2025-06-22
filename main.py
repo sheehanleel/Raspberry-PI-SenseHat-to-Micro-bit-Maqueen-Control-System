@@ -66,6 +66,8 @@ The Simulation #Phase 3
 It recreates ROS2's message flow using Python Class and function calls
 Can be extended to use a real ROS2 messages and communication infrastructure with small/minimal code changes
 Demonstrate a good understanding of how ROS2 nodes communicates and work together to be able to control the robot or enable robot control.
+
+----------------------------------------------------------------------------------------------------------------------------------------------
 ''' #Please Read the implementation and explanation Docstring
 
 #####
