@@ -1,7 +1,10 @@
-from pi_controller_sim import PiController
-from microbit_maqueen_sim import VirtualMaqueen
-from sense_hat import SenseHat, mapping_event_command
-import time
+from pi_controller_sim import PiController #Phase 1
+from microbit_maqueen_sim import VirtualMaqueen #Phase 1
+from sense_hat import SenseHat, mapping_event_command #Phase 2
+import time #Phase 2
+from input_node import InputNode #Phase 3
+from comm_node import CommNode #Phase 3
+
 '''
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +51,21 @@ Then the controller gives the command to the virtual Maqueen Robot, which respon
 A quick short delay (time.sleep(0.5)) is added to get the same feeling of real user interaction.
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
+Phase 3 - Goal: Wrap existing functionality in ROS2 framework ( hopefully :) )
+
+In this Phase 3 it will be my understanding of ROS2 publishing/subscriber setting, simulating the conversion of joystick input to a ROS2-compatible message
+and passing it to the communication node that controls the Maqueen robot. As seen form the print runtime.
+
+Implementation details:
+The InputNode simulates the ROS2 publisher, reading mock SenseHat joystick input and converting it to a ROS2-compatible message or geometry_msgs/Twist message.
+The CommNode acts as the ROS2 subscriber, receiving the message, processing the contents, and sending/issuing the correct command to the robot
+As you may see there may no be a real ROS2 tools used, but this setup mirrors the structure and data flow of a real ROS2 robotic teleoperation.
+
+The Simulation #Phase 3
+It recreates ROS2's message flow using Python Class and function calls
+Can be extended to use a real ROS2 messages and communication infrastructure with small/minimal code changes
+Demonstrate a good understanding of how ROS2 nodes communicates and work together to be able to control the robot or enable robot control.
 ''' #Please Read the implementation and explanation Docstring
 
 #####
@@ -70,7 +88,7 @@ if __name__ == "__main__":
 
     # Simulate teleoperation: map joystick directions to commands
     # Custom Joystick Movement
-    custom_events = [
+    custom_events = [  #Feel free to change the direction to what you want. e.g. up, down, middle left, right.
         {"direction": "right"},
         {"direction": "right"},
         {"direction": "left"},
@@ -82,15 +100,31 @@ if __name__ == "__main__":
     sensehat = SenseHat(events=custom_events)
 
     for event in sensehat.stick.get_events():
-        print("--------------------------")
+        print(".............")
         cmd = mapping_event_command.get(event["direction"], "STOP")
         print(f"[SenseHAT] Joystick: {event['direction']} -> Command: {cmd}")
         pi.send_command(cmd)
         time.sleep(0.5)
-        print("--------------------------")
+        print(".............")
 
     print("******************************************** Phase 2 Simulation Complete ********************************************")
 
+    # Phase 3 #
 
+    input_node = InputNode(events=custom_events)
+    comm_node = CommNode(robot) #uses the robot defined at the start "robot = VirtualMaqueen()"
+
+    #We will still use custom_events as our input.
+
+    for twist in input_node.get_next_twist():
+        print("++++++++++++++")
+        print(f"[InputNode] Publishing Twist: linear_x={twist.linear['x']}, angular_z={twist.angular['z']}")
+        comm_node.handle_twist(twist)
+        time.sleep(0.5)
+        print("++++++++++++++")
+
+    print("******************************************** Phase 3 Simulation Complete ********************************************")
+
+    # Phase 3 #
 
 
