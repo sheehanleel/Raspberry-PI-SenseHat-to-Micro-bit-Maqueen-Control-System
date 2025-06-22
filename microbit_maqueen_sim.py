@@ -5,8 +5,9 @@ class VirtualMaqueen:
     def receive_command(self, cmd):
         actions = {
             'FWD': 'Moving Forward',
-            'STOP': 'Stopping',
             'LEFT': 'Turning Left',
-            'RIGHT': 'Turning Right'
+            'REV': 'Moving Backwards',
+            'RIGHT': 'Turning Right',
+            'STOP': 'Stopping'
         }
         print(f"[Maqueen] {actions.get(cmd, 'Unknown Command')}")
